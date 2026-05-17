@@ -62,8 +62,14 @@ KEYWORDS = [
 # 敏感词跳过清单（标题命中则不推送，避免企业微信审核）
 # 只匹配标题，不匹配正文，防止误杀
 SKIP_KEYWORDS = [
+    # 涉政敏感
     "Tibet", "Xinjiang", "Uyghur", "Tiananmen",
     "Falun Gong", "Hong Kong independence",
+    "Taiwan independence", "Taiwan.*sovereignty",
+    # 领导人负面
+    "Xi Jinping.*critic", "dictator",
+    # 军事冲突
+    "war.*China", "invasion.*Taiwan", "PLA.*attack",
 ]
 
 # 全文字数上限（超过则截断，避免单条消息超企业微信 4096 字节限制）

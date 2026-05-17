@@ -41,10 +41,11 @@ def fetch_rss(url):
         return []
 
 
-def _match_skip(title):
-    """敏感词检查，命中返回 True 则该文章跳过"""
+def _match_skip(title, summary=""):
+    """敏感词检查，标题或摘要命中则跳过"""
+    text = f"{title} {summary}"
     for kw in config.SKIP_KEYWORDS:
-        if re.search(kw, title, re.IGNORECASE):
+        if re.search(kw, text, re.IGNORECASE):
             return True
     return False
 
@@ -164,8 +165,8 @@ def classify_articles(entries, source_name):
             continue
         seen_titles.add(title)
 
-        # 敏感词过滤：标题命中则跳过
-        if _match_skip(title):
+        # 敏感词过滤：标题或摘要命中则跳过
+        if _match_skip(title, summary):
             continue
 
         # 关键词匹配标题或摘要
