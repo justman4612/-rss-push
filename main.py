@@ -22,6 +22,7 @@ if sys.platform == "win32":
 
 import config
 import dedup
+import translate as translator
 
 
 def fetch_rss(url):
@@ -222,6 +223,14 @@ def build_full_text(article, index):
     if article["link"]:
         print(f"  抓取全文 [{index}]: {title[:50]}...")
         text = fetch_article_text(article["link"])
+
+    # 翻译（非中文源 + 非 dry-run）
+    is_cn_source = article["source"] in ("联合早报",)
+    if text and not is_cn_source and "--no-translate" not in sys.argv:
+        try:
+            text = translator.batch_translate([text])[0]
+        except Exception:
+            pass
 
     if len(text) > config.FULL_TEXT_MAX_CHARS:
         text = text[:config.FULL_TEXT_MAX_CHARS] + "\n\n…"
@@ -454,6 +463,22 @@ def main():
     if not all_articles:
         print("全部重复，跳过推送")
         return
+
+    # 翻译（跳过中文源和 dry-run 模式）
+    if "--no-translate" not in sys.argv:
+        print("\n翻译中...")
+        # 标题
+        titles = [art["title"] for art in all_articles]
+        translated_titles = translator.batch_translate(titles)
+        # 摘要
+        summaries = [art["summary"] for art in all_articles]
+        translated_summaries = translator.batch_translate(summaries)
+        # 应用
+        for i, art in enumerate(all_articles):
+            if art["source"] not in ("联合早报",):
+                art["title"] = translated_titles[i]
+                art["summary"] = translated_summaries[i]
+        print("翻译完成")
 
     # 2. 发送摘要
     print("\n发送摘要...")
