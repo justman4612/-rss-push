@@ -68,7 +68,7 @@ KEYWORDS = [
 ]
 
 # 全文字数上限（超过则截断，避免单条消息超企业微信 4096 字节限制）
-FULL_TEXT_MAX_CHARS = 1000
+FULL_TEXT_MAX_CHARS = 1200
 
 # Webhook URL 从环境变量读取，不写死在代码里
 # export WECHAT_WEBHOOK_URL="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxx"

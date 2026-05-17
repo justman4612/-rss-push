@@ -170,43 +170,51 @@ def classify_articles(entries, source_name):
     return results
 
 
+def _source_color(source):
+    """来源对应企业微信颜色"""
+    return {
+        "BBC": "warning",       # 橙
+        "CNN": "warning",
+        "联合早报": "info",      # 蓝
+    }.get(source, "info")
+
+
 def build_summary(all_articles):
-    """构建摘要消息（Markdown）"""
+    """摘要消息：来源分块 + 标题粗体 + 摘要缩进，留白呼吸"""
     beijing_tz = timezone(timedelta(hours=8))
     today = datetime.now(beijing_tz).strftime("%Y-%m-%d %A")
 
-    lines = [f"📰 **今日新闻速览 | {today}**\n"]
-
-    # 按来源分组
     from collections import OrderedDict
     grouped = OrderedDict()
     for art in all_articles:
         grouped.setdefault(art["source"], []).append(art)
 
+    lines = ["**📰 今日新闻速览**", f'<font color="comment">{today}</font>', ""]
+
     total = 0
     for source, articles in grouped.items():
-        lines.append(f"---")
-        lines.append(f"**【{source}】** ({len(articles)}篇)")
-        for i, art in enumerate(articles, 1):
+        color = _source_color(source)
+        lines.append(f'<font color="{color}">◆ {source} · {len(articles)} 篇</font>')
+        lines.append("")
+        for art in articles:
             total += 1
-            title = art["title"].replace("\n", " ").replace("\r", "")
-            # 企业微信 markdown 不支持某些特殊字符，做转义
-            title = re.sub(r'[\[\]\*_~]', '', title)
-            summary = art["summary"][:120].replace("\n", " ")
-            summary = re.sub(r'[\[\]\*_~]', '', summary)
-            lines.append(f"> **{total}.** {title}")
+            title = re.sub(r'[\[\]\*_~#]', '', art["title"].replace("\n", " "))
+            summary = re.sub(r'[\[\]\*_~#]', '', art["summary"][:100].replace("\n", " "))
+            lines.append(f"**{total}.** {title}")
             if summary:
-                lines.append(f"> _{summary}_")
-            lines.append("")
+                lines.append(f"> {summary}")
+        lines.append("")
 
-    lines.append(f"共 **{total}** 篇 · 下文附全文")
+    lines.append(f'<font color="comment">共 {total} 篇 · 下文附全文</font>')
     return "\n".join(lines)
 
 
 def build_full_text(article, index):
-    """构建单篇文章全文消息（Markdown）"""
+    """单篇全文：来源标签 + 标题 + 正文，段落间空行不累眼"""
     source = article["source"]
-    title = re.sub(r'[\[\]\*_~]', '', article["title"])
+    title = re.sub(r'[\[\]\*_~#]', '', article["title"])
+    color = _source_color(source)
+    safe_source = re.sub(r'[\[\]\*_~#]', '', source)
 
     # 抓取全文
     text = ""
@@ -214,24 +222,25 @@ def build_full_text(article, index):
         print(f"  抓取全文 [{index}]: {title[:50]}...")
         text = fetch_article_text(article["link"])
 
-    # 截断
     if len(text) > config.FULL_TEXT_MAX_CHARS:
-        text = text[:config.FULL_TEXT_MAX_CHARS] + "\n\n...(已截断)"
+        text = text[:config.FULL_TEXT_MAX_CHARS] + "\n\n…"
 
     if not text:
-        text = article.get("summary", "(无法获取全文)")
+        text = article.get("summary", "")
 
-    lines = [
-        f"📄 **{index}. [{source}] {title}**",
-        "",
-        text,
-    ]
+    # 段落分拆，每段用引用块包裹（视觉缩进 + 防止特殊字符破坏 markdown）
+    paragraphs = [p.strip() for p in text.split("\n") if p.strip()]
+    body_lines = []
+    for p in paragraphs:
+        p_escaped = re.sub(r'^([\*#\->])', r'\\\1', p)
+        body_lines.append(f"> {p_escaped}")
+    body = "\n>\n".join(body_lines) if body_lines else ""
 
-    if article["link"]:
-        lines.append("")
-        lines.append(f"原文链接: {article['link']}")
-
-    return "\n".join(lines)
+    return (
+        f'<font color="{color}">{safe_source}</font>  '
+        f"**{title}**\n\n"
+        f"{body}"
+    )
 
 
 def send_wechat(content, webhook_url):
