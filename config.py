@@ -43,6 +43,10 @@ KEYWORDS = [
     "recession", "stock market", "Wall Street", "Nasdaq", "S&P 500",
     "oil price", "OPEC", "supply chain", "trade deficit",
     "央行", "通胀", "加息", "降息", "衰退", "股市", "油价", "供应链",
+    # 中国经济（只抓数据面，避负面叙事）
+    "China GDP", "China.*trade", "China.*export", "China.*import",
+    "PBOC", "People's Bank of China", "Chinese consumer",
+    "中国经济", "中国贸易", "进出口", "消费市场",
 
     # === 新能源 & 气候 ===
     "climate", "renewable", "solar", "wind power", "electric vehicle",
@@ -68,6 +72,10 @@ SKIP_KEYWORDS_EN = [
     "Taiwan independence", "Taiwan.*sovereignty",
     "Xi.*critic", "dictator",
     "war.*China", "invasion.*Taiwan", "PLA.*attack",
+    # 中国经济负面叙事
+    "China.*crash", "China.*collapse", "China.*crisis.*econom",
+    "China.*debt bomb", "China.*ghost city",
+    "unemployment.*surge.*China",
 ]
 SKIP_KEYWORDS_CN = [
     "台湾独立", "台湾主权", "藏独", "疆独", "香港独立",
