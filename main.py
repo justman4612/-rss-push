@@ -41,6 +41,17 @@ def fetch_rss(url):
         return []
 
 
+def _match_cn_safe(text):
+    """日本源中国关键词匹配"""
+    if not text:
+        return False
+    t = text.lower()
+    for kw in config.KEYWORDS_SAFE_CHINA:
+        if kw.lower() in t:
+            return True
+    return False
+
+
 def _match_skip(title, summary=""):
     """敏感词检查：英文 + 中文双语匹配"""
     text = f"{title} {summary}"
@@ -172,8 +183,12 @@ def classify_articles(entries, source_name):
         if _match_skip(title, summary):
             continue
 
-        # 关键词匹配标题或摘要
-        if match_keywords(title) or match_keywords(summary):
+        # 关键词匹配（日本源额外加中国关键词）
+        matched = match_keywords(title) or match_keywords(summary)
+        if source_name in ("NHK", "JapanTimes"):
+            matched = matched or _match_cn_safe(title) or _match_cn_safe(summary)
+        if not matched:
+            continue
             link = entry.get("link", "")
             published = entry.get("published", "") or entry.get("updated", "")
 

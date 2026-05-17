@@ -28,6 +28,12 @@ SOURCES = {
 # 每个源最多取多少条（从 RSS 中取前 N 条，再在其中做关键词过滤）
 MAX_PER_SOURCE = 15
 
+# 仅日本源（NHK/JapanTimes）生效的中国关键词——日本视角温和，不触雷
+KEYWORDS_SAFE_CHINA = [
+    "China", "Chinese", "Beijing", "Shanghai", "Guangdong",
+    "中国", "北京", "上海", "广东", "深圳",
+]
+
 # 关键词（命中标题或摘要才推送，不区分大小写）
 # NHK/JapanTimes 提供日本视角，BBC/CNN 提供西方视角
 KEYWORDS = [

@@ -3,3 +3,6 @@ __pycache__/
 *.pyo
 __pycache__
 test_push.py
+pushed.json
+*.log
+.DS_Store
