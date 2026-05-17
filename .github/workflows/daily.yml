@@ -4,7 +4,7 @@ on:
   schedule:
     # UTC 0:00 = 北京时间 8:00
     - cron: "0 0 * * *"
-  workflow_dispatch:  # 允许手动触发测试
+  workflow_dispatch:
 
 jobs:
   push:
@@ -12,6 +12,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Restore push cache
+        uses: actions/cache/restore@v4
+        with:
+          path: pushed.json
+          key: pushed-news-${{ github.run_number }}
+          restore-keys: |
+            pushed-news-
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -24,4 +32,11 @@ jobs:
       - name: Run
         env:
           WECHAT_WEBHOOK_URL: ${{ secrets.WECHAT_WEBHOOK_URL }}
+          PUSHED_CACHE_FILE: pushed.json
         run: python main.py
+
+      - name: Save push cache
+        uses: actions/cache/save@v4
+        with:
+          path: pushed.json
+          key: pushed-news-${{ github.run_number }}

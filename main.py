@@ -21,6 +21,7 @@ if sys.platform == "win32":
         pass
 
 import config
+import dedup
 
 
 def fetch_rss(url):
@@ -442,7 +443,17 @@ def main():
             seen.add(art["title"].lower())
             unique.append(art)
     all_articles = unique
-    print(f"\n去重后共 {len(all_articles)} 篇")
+    print(f"\n同次去重后共 {len(all_articles)} 篇")
+
+    # 去重（跨天：7天内标题不重复推送）
+    all_articles, skipped = dedup.filter_new(all_articles)
+    if skipped:
+        print(f"跨天去重跳过 {skipped} 篇（7天内已推送）")
+    print(f"最终推送 {len(all_articles)} 篇")
+
+    if not all_articles:
+        print("全部重复，跳过推送")
+        return
 
     # 2. 发送摘要
     print("\n发送摘要...")
@@ -463,6 +474,10 @@ def main():
             print(f"  [{i}/{len(all_articles)}] 发送失败: {art['title'][:40]}")
 
     print(f"\n完成: 摘要 + {success}/{len(all_articles)} 篇全文已推送")
+
+    # 记录已推送（下次不重复推）
+    dedup.save_pushed(all_articles)
+    print("推送记录已保存")
 
 
 if __name__ == "__main__":
