@@ -16,8 +16,8 @@ SOURCES = {
         "http://rss.cnn.com/rss/cnn_allpolitics.rss",
     ],
     "NHK": [
-        # NHK 英文，日本视角（RSSHub 路由）
-        "https://rsshub.app/nhk/world",
+        # NHK 日本语新闻 RSS（靠翻译翻中文）
+        "https://www3.nhk.or.jp/news/rss/new1000.xml",
     ],
     "JapanTimes": [
         # 日本时报英文版
@@ -41,32 +41,35 @@ KEYWORDS = [
     "artificial intelligence", "machine learning", "deep learning",
     "ChatGPT", "OpenAI", "DeepSeek", "large language model", "LLM",
     "Nvidia", "GPU", "semiconductor", "chip",
-    "AI", "robot", "autonomous",
-    "人工智能", "大模型", "芯片", "半导体", "英伟达", "机器人",
+    "AI", "robot", "autonomous", "AI",
+    "tech", "technology", "digital", "software", "cyber",
+    "人工智能", "大模型", "芯片", "半导体", "英伟达", "机器人", "科技",
 
     # === 全球经济 ===
-    "Fed", "Federal Reserve", "ECB", "inflation", "interest rate",
-    "recession", "stock market", "Wall Street", "Nasdaq", "S&P 500",
-    "oil price", "OPEC", "supply chain", "trade deficit",
-    "央行", "通胀", "加息", "降息", "衰退", "股市", "油价", "供应链",
-    # 中国经济（只抓数据面，避负面叙事）
-    "China GDP", "China.*trade", "China.*export", "China.*import",
-    "PBOC", "People's Bank of China", "Chinese consumer",
-    "中国经济", "中国贸易", "进出口", "消费市场",
+    "economy", "economic", "inflation", "bank", "market", "dollar",
+    "Fed", "interest rate", "recession", "Wall Street", "Nasdaq",
+    "oil", "energy", "supply chain", "trade",
+    "economic growth", "budget",
+    "经济", "通胀", "加息", "降息", "衰退", "股市", "油价", "贸易",
+    "央行", "利率", "汇率", "供应链",
+    # 中国经济数据面
+    "China GDP", "China.*trade", "PBOC", "Chinese consumer",
+    "人民币", "进出口", "消费",
 
     # === 新能源 & 气候 ===
-    "climate", "renewable", "solar", "wind power", "electric vehicle",
-    "Tesla", "BYD", "battery", "carbon",
-    "新能源", "电动车", "电池", "碳中和", "太阳能",
+    "climate", "renewable", "solar", "wind", "electric vehicle",
+    "Tesla", "battery", "carbon", "green", "environment",
+    "新能源", "电动车", "电池", "碳中和", "太阳能", "环保",
 
     # === 互联网 & 商业 ===
     "Apple", "Google", "Microsoft", "Amazon", "Meta",
     "startup", "venture capital", "IPO",
+    "business", "industry", "company", "billion",
     "华为", "小米", "腾讯", "字节", "阿里", "创业", "融资",
 
-    # === 深度报道 ===
-    "analysis", "in-depth", "investigation", "explainer",
-    "深度", "分析", "调查", "解读",
+    # === 深度 ===
+    "analysis", "in-depth", "investigation",
+    "深度", "分析", "调查",
 ]
 
 # 敏感词跳过清单（标题命中则不推送，避免企业微信审核）
