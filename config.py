@@ -68,6 +68,13 @@ KEYWORDS = [
     "深度", "分析", "评论", "调查", "特写", "解读",
 ]
 
+# 敏感词跳过清单（标题命中则不推送，避免企业微信审核）
+# 只匹配标题，不匹配正文，防止误杀
+SKIP_KEYWORDS = [
+    "Tibet", "Xinjiang", "Uyghur", "Tiananmen",
+    "Falun Gong", "Hong Kong independence",
+]
+
 # 全文字数上限（超过则截断，避免单条消息超企业微信 4096 字节限制）
 FULL_TEXT_MAX_CHARS = 1200
 
