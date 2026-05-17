@@ -189,16 +189,17 @@ def classify_articles(entries, source_name):
             matched = matched or _match_cn_safe(title) or _match_cn_safe(summary)
         if not matched:
             continue
-            link = entry.get("link", "")
-            published = entry.get("published", "") or entry.get("updated", "")
 
-            results.append({
-                "source": source_name,
-                "title": title,
-                "summary": summary[:300],  # 摘要截断，详情见全文
-                "link": link,
-                "published": published,
-            })
+        link = entry.get("link", "")
+        published = entry.get("published", "") or entry.get("updated", "")
+
+        results.append({
+            "source": source_name,
+            "title": title,
+            "summary": summary[:300],
+            "link": link,
+            "published": published,
+        })
 
     return results
 
