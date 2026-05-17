@@ -199,7 +199,7 @@ def _source_color(source):
 
 
 def build_summary(all_articles):
-    """摘要消息：来源分块 + 标题粗体 + 摘要缩进，留白呼吸"""
+    """摘要消息：来源分块 + 标题粗体 + 摘要缩进，自动截断不超 4096 字节"""
     beijing_tz = timezone(timedelta(hours=8))
     today = datetime.now(beijing_tz).strftime("%Y-%m-%d %A")
 
@@ -208,24 +208,42 @@ def build_summary(all_articles):
     for art in all_articles:
         grouped.setdefault(art["source"], []).append(art)
 
-    lines = ["**📰 今日新闻速览**", f'<font color="comment">{today}</font>', ""]
+    header = f"**📰 今日新闻速览**\n<font color=\"comment\">{today}</font>\n"
+    max_bytes = 4000  # 留 96 字节余量
 
+    # 尝试构建，超长则逐篇缩减
+    lines = []
     total = 0
+    truncated = False
     for source, articles in grouped.items():
         color = _source_color(source)
-        lines.append(f'<font color="{color}">◆ {source} · {len(articles)} 篇</font>')
+        src_header = f'<font color="{color}">◆ {source} · {len(articles)} 篇</font>'
+        lines.append(src_header)
         lines.append("")
         for art in articles:
-            total += 1
             title = re.sub(r'[\[\]\*_~#]', '', art["title"].replace("\n", " "))
-            summary = re.sub(r'[\[\]\*_~#]', '', art["summary"][:100].replace("\n", " "))
-            lines.append(f"**{total}.** {title}")
+            summary = re.sub(r'[\[\]\*_~#]', '', art["summary"][:80].replace("\n", " "))
+            entry_lines = [f"**{total + 1}.** {title}"]
             if summary:
-                lines.append(f"> {summary}")
-        lines.append("")
+                entry_lines.append(f"> {summary}")
+            entry = "\n".join(entry_lines)
+            # 检查加上这篇后是否超限
+            trial = header + "\n".join(lines + [entry] + [""])
+            if len(trial.encode("utf-8")) > max_bytes:
+                truncated = True
+                break
+            lines.append(entry)
+            lines.append("")
+            total += 1
+        if truncated:
+            break
 
-    lines.append(f'<font color="comment">共 {total} 篇 · 下文附全文</font>')
-    return "\n".join(lines)
+    footer = f'<font color="comment">共 {total} 篇' + ("（部分未列）" if truncated else "") + " · 下文附全文</font>"
+    result = header + "\n".join(lines) + "\n" + footer
+    # 最后兜底
+    if len(result.encode("utf-8")) > 4096:
+        result = header + f'<font color="comment">{total} 篇 · 正文见下方</font>'
+    return result
 
 
 def build_full_text(article, index):
