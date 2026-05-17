@@ -175,9 +175,10 @@ def classify_articles(entries, source_name):
 def _source_color(source):
     """来源对应企业微信颜色"""
     return {
-        "BBC": "warning",       # 橙
+        "BBC": "warning",
         "CNN": "warning",
-        "联合早报": "info",      # 蓝
+        "NHK": "info",
+        "JapanTimes": "comment",
     }.get(source, "info")
 
 
@@ -224,9 +225,8 @@ def build_full_text(article, index):
         print(f"  抓取全文 [{index}]: {title[:50]}...")
         text = fetch_article_text(article["link"])
 
-    # 翻译（非中文源 + 非 dry-run）
-    is_cn_source = article["source"] in ("联合早报",)
-    if text and not is_cn_source and "--no-translate" not in sys.argv:
+    # 翻译（非 dry-run 模式）
+    if text and "--no-translate" not in sys.argv:
         try:
             text = translator.batch_translate([text])[0]
         except Exception:
@@ -475,9 +475,8 @@ def main():
         translated_summaries = translator.batch_translate(summaries)
         # 应用
         for i, art in enumerate(all_articles):
-            if art["source"] not in ("联合早报",):
-                art["title"] = translated_titles[i]
-                art["summary"] = translated_summaries[i]
+            art["title"] = translated_titles[i]
+        art["summary"] = translated_summaries[i]
         print("翻译完成")
 
     # 2. 发送摘要

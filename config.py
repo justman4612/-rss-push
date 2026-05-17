@@ -15,12 +15,13 @@ SOURCES = {
         "http://rss.cnn.com/rss/money_latest.rss",
         "http://rss.cnn.com/rss/cnn_allpolitics.rss",
     ],
-    "联合早报": [
-        # 联合早报官方 RSS 已关，用 RSSHub 抓取
-        "https://rsshub.app/zaobao/znews/china",
-        "https://rsshub.app/zaobao/znews/world",
-        "https://rsshub.app/zaobao/realtime/china",
-        "https://rsshub.app/zaobao/realtime/world",
+    "NHK": [
+        # NHK World 英文版，日本视角
+        "https://www3.nhk.or.jp/nhkworld/en/news/feed.xml",
+    ],
+    "JapanTimes": [
+        # 日本时报英文版
+        "https://www.japantimes.co.jp/feed/",
     ],
 }
 
