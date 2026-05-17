@@ -1,14 +1,26 @@
 """Google Translate 批量翻译（不用 API key，零成本）"""
 import re
+import time
 from deep_translator import GoogleTranslator
 
 CHUNK_SIZE = 4000
-# 用 Google Translate 不会改动的分隔符
 SEP = "\n<<<SEP>>>\n"
+MAX_RETRIES = 2
+
+
+def _translate_one(text, source="auto", target="zh-CN"):
+    """翻译单条，带重试"""
+    for attempt in range(MAX_RETRIES + 1):
+        try:
+            return GoogleTranslator(source=source, target=target).translate(text)
+        except Exception:
+            if attempt < MAX_RETRIES:
+                time.sleep(2)
+    raise RuntimeError("translation failed after retries")
 
 
 def batch_translate(texts, source="auto", target="zh-CN"):
-    """批量翻译，拼接后一次调多段，减少 API 调用"""
+    """批量翻译，拼接后一次调多段。失败则逐条降级"""
     if not texts:
         return []
 
@@ -32,29 +44,33 @@ def batch_translate(texts, source="auto", target="zh-CN"):
     if current_chunk:
         chunks.append(current_chunk)
 
-    translator = GoogleTranslator(source=source, target=target)
     results = list(texts)
+    fail_count = 0
 
     for ci, chunk in enumerate(chunks):
         combined = SEP.join(t for _, t in chunk)
-        try:
-            translated = translator.translate(combined)
-            # 用正则分割，容错空白变化
-            parts = re.split(r'\s*<<<SEP>>>\s*', translated)
+        translated = None
 
+        # 先尝试批量
+        try:
+            translated = GoogleTranslator(source=source, target=target).translate(combined)
+            parts = re.split(r'\s*<<<SEP>>>\s*', translated)
             if len(parts) == len(chunk):
                 for (idx, _), part in zip(chunk, parts):
                     results[idx] = part.strip()
-            else:
-                # 分割数不匹配，逐个翻译降级
-                print(f"    [翻译分割异常] 期望{len(chunk)}段 实际{len(parts)}段，降级逐条翻译")
-                for idx, text in chunk:
-                    try:
-                        results[idx] = translator.translate(text)
-                    except Exception:
-                        pass  # 保留原文
-        except Exception as e:
-            print(f"    [翻译失败 chunk{ci}]: {e}")
-            # 该组保留原文
+                time.sleep(0.5)  # 避免触发限流
+                continue
+        except Exception:
+            pass  # 降级到逐条
 
+        # 逐条降级
+        for idx, text in chunk:
+            try:
+                results[idx] = _translate_one(text)
+                time.sleep(0.3)
+            except Exception:
+                fail_count += 1
+
+    if fail_count:
+        print(f"    [翻译] {fail_count} 条翻译失败，保留原文")
     return results
