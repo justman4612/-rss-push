@@ -42,10 +42,13 @@ def fetch_rss(url):
 
 
 def _match_skip(title, summary=""):
-    """敏感词检查，标题或摘要命中则跳过"""
+    """敏感词检查：英文 + 中文双语匹配"""
     text = f"{title} {summary}"
-    for kw in config.SKIP_KEYWORDS:
+    for kw in config.SKIP_KEYWORDS_EN:
         if re.search(kw, text, re.IGNORECASE):
+            return True
+    for kw in config.SKIP_KEYWORDS_CN:
+        if kw in text:
             return True
     return False
 
@@ -489,8 +492,26 @@ def main():
         # 应用
         for i, art in enumerate(all_articles):
             art["title"] = translated_titles[i]
-        art["summary"] = translated_summaries[i]
+            art["summary"] = translated_summaries[i]
         print("翻译完成")
+
+        # 译后中文二次敏感检测
+        safe_articles = []
+        cn_skip_count = 0
+        for art in all_articles:
+            text = f"{art['title']} {art['summary']}"
+            if any(kw in text for kw in config.SKIP_KEYWORDS_CN):
+                print(f"  [译后拦截] {art['title'][:50]}")
+                cn_skip_count += 1
+            else:
+                safe_articles.append(art)
+        if cn_skip_count:
+            print(f"译后拦截 {cn_skip_count} 篇敏感内容")
+        all_articles = safe_articles
+
+        if not all_articles:
+            print("全部文章译后被拦截，跳过推送")
+            return
 
     # 2. 发送摘要
     print("\n发送摘要...")

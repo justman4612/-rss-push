@@ -16,8 +16,8 @@ SOURCES = {
         "http://rss.cnn.com/rss/cnn_allpolitics.rss",
     ],
     "NHK": [
-        # NHK World 英文版，日本视角
-        "https://www3.nhk.or.jp/nhkworld/en/news/feed.xml",
+        # NHK 英文，日本视角（RSSHub 路由）
+        "https://rsshub.app/nhk/world",
     ],
     "JapanTimes": [
         # 日本时报英文版
@@ -61,15 +61,18 @@ KEYWORDS = [
 
 # 敏感词跳过清单（标题命中则不推送，避免企业微信审核）
 # 只匹配标题，不匹配正文，防止误杀
-SKIP_KEYWORDS = [
-    # 涉政敏感
+# 敏感词跳过清单（同时检查英文原文和中译后中文）
+SKIP_KEYWORDS_EN = [
     "Tibet", "Xinjiang", "Uyghur", "Tiananmen",
     "Falun Gong", "Hong Kong independence",
     "Taiwan independence", "Taiwan.*sovereignty",
-    # 领导人负面
-    "Xi Jinping.*critic", "dictator",
-    # 军事冲突
+    "Xi.*critic", "dictator",
     "war.*China", "invasion.*Taiwan", "PLA.*attack",
+]
+SKIP_KEYWORDS_CN = [
+    "台湾独立", "台湾主权", "藏独", "疆独", "香港独立",
+    "天安门", "法轮功", "习近平", "独裁",
+    "武力攻台", "入侵台湾", "台独",
 ]
 
 # 全文字数上限（超过则截断，避免单条消息超企业微信 4096 字节限制）
