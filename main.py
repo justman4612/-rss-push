@@ -185,7 +185,7 @@ def classify_articles(entries, source_name):
 
         # 关键词匹配（日本源额外加中国关键词）
         matched = match_keywords(title) or match_keywords(summary)
-        if source_name in ("NHK", "JapanTimes"):
+        if source_name == "JapanTimes":
             matched = matched or _match_cn_safe(title) or _match_cn_safe(summary)
         if not matched:
             continue
@@ -208,7 +208,6 @@ def _source_color(source):
     return {
         "BBC": "warning",
         "CNN": "warning",
-        "NHK": "info",
         "JapanTimes": "comment",
     }.get(source, "info")
 

@@ -15,10 +15,6 @@ SOURCES = {
         "http://rss.cnn.com/rss/money_latest.rss",
         "http://rss.cnn.com/rss/cnn_allpolitics.rss",
     ],
-    "NHK": [
-        # NHK 日本语新闻 RSS（靠翻译翻中文）
-        "https://www3.nhk.or.jp/news/rss/new1000.xml",
-    ],
     "JapanTimes": [
         # 日本时报英文版
         "https://www.japantimes.co.jp/feed/",
@@ -28,7 +24,7 @@ SOURCES = {
 # 每个源最多取多少条（从 RSS 中取前 N 条，再在其中做关键词过滤）
 MAX_PER_SOURCE = 15
 
-# 仅日本源（NHK/JapanTimes）生效的中国关键词——日本视角温和，不触雷
+# 仅 JapanTimes 源生效的中国关键词——日本视角温和，不触雷
 KEYWORDS_SAFE_CHINA = [
     "China", "Chinese", "Beijing", "Shanghai", "Guangdong",
     "中国", "北京", "上海", "广东", "深圳",
@@ -41,7 +37,7 @@ KEYWORDS = [
     "artificial intelligence", "machine learning", "deep learning",
     "ChatGPT", "OpenAI", "DeepSeek", "large language model", "LLM",
     "Nvidia", "GPU", "semiconductor", "chip",
-    "AI", "robot", "autonomous", "AI",
+    "AI", "robot", "autonomous",
     "tech", "technology", "digital", "software", "cyber",
     "人工智能", "大模型", "芯片", "半导体", "英伟达", "机器人", "科技",
 
@@ -52,8 +48,10 @@ KEYWORDS = [
     "economic growth", "budget",
     "经济", "通胀", "加息", "降息", "衰退", "股市", "油价", "贸易",
     "央行", "利率", "汇率", "供应链",
-    # 中国经济数据面
+    # 中国经济（数据面，避负面叙事）
     "China GDP", "China.*trade", "PBOC", "Chinese consumer",
+    "China.*economy", "China.*tech", "China.*business",
+    "China.*market", "China.*energy",
     "人民币", "进出口", "消费",
 
     # === 新能源 & 气候 ===
