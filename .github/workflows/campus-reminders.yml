@@ -1,0 +1,41 @@
+name: Campus Reminder Scheduler
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: validate is offline; process may send real reminders
+        type: choice
+        options:
+          - validate
+          - process
+        default: validate
+  schedule:
+    # Every five minutes, offset from the top of the hour; best effort, not a deadline guarantee.
+    - cron: '2-57/5 * * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: campus-reminder-scheduler
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    if: github.event_name == 'workflow_dispatch' || vars.CAMPUS_SCHEDULER_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, verified tag
+        with:
+          persist-credentials: false
+      - name: Dispatch campus reminders
+        env:
+          CAMPUS_REMINDER_ENDPOINT: ${{ secrets.CAMPUS_REMINDER_ENDPOINT }}
+          CAMPUS_SCHEDULER_TOKEN: ${{ secrets.CAMPUS_SCHEDULER_TOKEN }}
+          CAMPUS_PLATFORM_TOKEN: ${{ secrets.CAMPUS_PLATFORM_TOKEN }}
+          CAMPUS_SCHEDULER_ENABLED: ${{ vars.CAMPUS_SCHEDULER_ENABLED }}
+          CAMPUS_DISPATCH_MODE: ${{ inputs.mode || 'process' }}
+        run: python3 campus_scheduler/dispatch.py "$CAMPUS_DISPATCH_MODE"
