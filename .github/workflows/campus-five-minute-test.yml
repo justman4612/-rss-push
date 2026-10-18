@@ -1,0 +1,41 @@
+name: Campus One Email After Five Minutes
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_one_email:
+        description: Send exactly one approved server-allowlisted test email after a five-minute runner delay
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: campus-reminder-scheduler
+  cancel-in-progress: false
+
+jobs:
+  one-email:
+    if: inputs.confirm_one_email == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Record start and wait five minutes in the cloud
+        run: |
+          date -u '+runner_started_at_utc=%Y-%m-%dT%H:%M:%SZ'
+          printf '%s\n' 'One-shot workflow_dispatch test. This does not test cron scheduling.'
+          sleep 300
+      - name: Checkout reviewed client
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Make exactly one processing request
+        env:
+          CAMPUS_REMINDER_ENDPOINT: ${{ secrets.CAMPUS_REMINDER_ENDPOINT }}
+          CAMPUS_SCHEDULER_TOKEN: ${{ secrets.CAMPUS_SCHEDULER_TOKEN }}
+          CAMPUS_PLATFORM_TOKEN: ${{ secrets.CAMPUS_PLATFORM_TOKEN }}
+          # This one confirmed manual job only; the repository's periodic gate stays false.
+          CAMPUS_SCHEDULER_ENABLED: 'true'
+        run: python3 campus_scheduler/test_once.py
