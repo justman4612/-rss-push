@@ -1,0 +1,22 @@
+name: Campus Schedule Clock Probe
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *'
+
+permissions: {}
+
+jobs:
+  clock:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Record trigger only; no secrets or application calls
+        env:
+          TRIGGER_EVENT: ${{ github.event_name }}
+          TRIGGER_SCHEDULE: ${{ github.event.schedule }}
+        run: |
+          printf 'event=%s\nschedule=%s\n' "$TRIGGER_EVENT" "$TRIGGER_SCHEDULE"
+          date -u '+started_at_utc=%Y-%m-%dT%H:%M:%SZ'
+          printf '%s\n' 'Clock probe only. No school API calls, no credentials, no email.'
