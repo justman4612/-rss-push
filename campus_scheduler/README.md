@@ -4,7 +4,9 @@ One operator-managed scheduler serves all users. End users do not need GitHub ac
 
 ## Current status
 
-Prepared client and workflows only. No verified campus HTTP endpoint or scheduler credentials have been provided. No production deployment or scheduled mail sending has been enabled. Local tests use mock HTTP and never send mail. The existing daily RSS workflow is unchanged.
+The application has been deployed with real sending disabled. Live checks on 2026-10-18 confirmed authenticated health 200, the POST scheduler route in OpenAPI, rejection of missing/wrong scheduler credentials, and the closed-gate response with zero claimed/sent/failed. The endpoint, scheduler credential and platform API credential are configured as encrypted repository Actions Secrets. Their values are not stored here.
+
+The repository scheduler gate remains `false`. Periodic real email delivery has not been tested or enabled; production schema evidence and a new server-allowlisted test batch must be verified for the next controlled trial. Local and CI unit tests use mock HTTP and never send mail. The existing daily RSS workflow is unchanged.
 
 ## Server contract to implement and verify
 
