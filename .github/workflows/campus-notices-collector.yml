@@ -1,0 +1,56 @@
+name: Campus Notices Collector
+
+on:
+  schedule:
+    # 北京时间每天 07:30（GitHub schedule 尽力而为，实际可能延迟小时级）
+    - cron: "30 23 * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "verify=只读契约检查 / discover=只读发现 / run=真实导入"
+        required: true
+        default: verify
+        type: choice
+        options: [verify, discover, run]
+      limit:
+        description: "run 模式单次最多导入条数"
+        required: false
+        default: "5"
+
+# 门控：仓库变量 CAMPUS_COLLECTOR_ENABLED 必须为 true，定时才执行；手动 dispatch 不受限（便于先测试）
+concurrency:
+  group: campus-notices-collector
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || vars.CAMPUS_COLLECTOR_ENABLED == 'true' }}
+    permissions:
+      contents: write
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, verified tag
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install beautifulsoup4
+      - name: Run collector
+        working-directory: .github/scripts/campus-notices-driver
+        env:
+          CAMPUS_SCHEDULER_TOKEN: ${{ secrets.CAMPUS_SCHEDULER_TOKEN }}
+          CAMPUS_PLATFORM_TOKEN: ${{ secrets.CAMPUS_PLATFORM_TOKEN }}
+        run: python3 campus_notice_driver.py "${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'run' }}" --limit "${{ inputs.limit || 5 }}"
+      - name: Commit updated state
+        if: ${{ github.event_name == 'schedule' && vars.CAMPUS_COLLECTOR_ENABLED == 'true' }}
+        run: |
+          git config user.name "campus-notices-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add .github/scripts/campus-notices-driver/known_notices.json
+          if git diff --cached --quiet; then
+            echo "No state change."
+          else
+            git commit -m "collector: update imported notices state"
+            git push
+          fi
