@@ -43,7 +43,8 @@ jobs:
           CAMPUS_PLATFORM_TOKEN: ${{ secrets.CAMPUS_PLATFORM_TOKEN }}
         run: python3 campus_notice_driver.py "${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'run' }}" --limit "${{ inputs.limit || 5 }}"
       - name: Commit updated state
-        if: ${{ github.event_name == 'schedule' && vars.CAMPUS_COLLECTOR_ENABLED == 'true' }}
+        # schedule 运行和手动 run 成功后都要回写状态，防止下次重复导入
+        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'run') }}
         run: |
           git config user.name "campus-notices-bot"
           git config user.email "actions@users.noreply.github.com"

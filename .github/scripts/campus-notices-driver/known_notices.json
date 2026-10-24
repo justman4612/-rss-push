@@ -1,9 +1,53 @@
 {
   "known": {
-    "https://www.xsyu.edu.cn/info/1072/59199.htm": {"title": "关于开展2023级学生体质健康标准补测工作的通知", "doc_ids": ["7700052953155076111"], "imported_at_utc": "2026-10-24T04:00:00Z"},
-    "https://jwch.xsyu.edu.cn/info/1048/4206.htm": {"title": "2026年校级优质课程建设项目（智慧课程专项）立项申报", "doc_ids": ["7700052246628843574"], "imported_at_utc": "2026-10-24T04:00:00Z"},
-    "https://www.xsyu.edu.cn/info/1072/59198.htm": {"title": "2026年体质健康标准测试", "doc_ids": ["7700052271887073318"], "imported_at_utc": "2026-10-24T04:00:00Z"},
-    "https://jwch.xsyu.edu.cn/info/1048/3197.htm": {"title": "自助服务平台及可信电子文档系统上线试运行", "doc_ids": ["7700057495150051363"], "imported_at_utc": "2026-10-24T04:00:00Z"},
-    "https://jwch.xsyu.edu.cn/info/1048/4207.htm": {"title": "2023年校级教改延期项目验收结果公示", "doc_ids": ["7700052479282806824"], "imported_at_utc": "2026-10-24T04:00:00Z"}
+    "https://www.xsyu.edu.cn/info/1072/59199.htm": {
+      "title": "关于开展2023级学生体质健康标准补测工作的通知",
+      "doc_ids": [
+        "7700052953155076111"
+      ],
+      "imported_at_utc": "2026-10-24T04:00:00Z"
+    },
+    "https://jwch.xsyu.edu.cn/info/1048/4206.htm": {
+      "title": "2026年校级优质课程建设项目（智慧课程专项）立项申报",
+      "doc_ids": [
+        "7700052246628843574"
+      ],
+      "imported_at_utc": "2026-10-24T04:00:00Z"
+    },
+    "https://www.xsyu.edu.cn/info/1072/59198.htm": {
+      "title": "2026年体质健康标准测试",
+      "doc_ids": [
+        "7700052271887073318"
+      ],
+      "imported_at_utc": "2026-10-24T04:00:00Z"
+    },
+    "https://jwch.xsyu.edu.cn/info/1048/3197.htm": {
+      "title": "自助服务平台及可信电子文档系统上线试运行",
+      "doc_ids": [
+        "7700057495150051363"
+      ],
+      "imported_at_utc": "2026-10-24T04:00:00Z"
+    },
+    "https://jwch.xsyu.edu.cn/info/1048/4207.htm": {
+      "title": "2023年校级教改延期项目验收结果公示",
+      "doc_ids": [
+        "7700052479282806824"
+      ],
+      "imported_at_utc": "2026-10-24T04:00:00Z"
+    },
+    "https://jwch.xsyu.edu.cn/info/1048/3476.htm": {
+      "title": "西安石油大学关于做好2025届本科毕业设计（论文）工作的通知",
+      "doc_ids": [
+        "7700169323092115494"
+      ],
+      "imported_at_utc": "2026-10-24T12:16:55Z"
+    },
+    "https://jwch.xsyu.edu.cn/info/1048/2215.htm": {
+      "title": "关于已毕业学生的身份证变更、学信网学历查询等相关问题的说明",
+      "doc_ids": [
+        "7700185511050313770"
+      ],
+      "imported_at_utc": "2026-10-24T12:16:55Z"
+    }
   }
 }
