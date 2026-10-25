@@ -204,6 +204,23 @@ def main():
                     "title": item.get("title", "")}
             for item in body.get("failed", []):
                 report["failed"].append(item)
+    # 每日摘要邮件：有新导入才发，空导入不发
+    if report["imported"]:
+        digest_payload = {
+            "request_id": str(uuid.uuid4()),
+            "date": report["run_at_utc"][:10],
+            "notices": [
+                {"title": it.get("title") or it.get("source_url", ""),
+                 "source_url": it.get("source_url", ""),
+                 "published_at": it.get("published_at", "")}
+                for it in report["imported"]
+            ],
+        }
+        try:
+            dcode, dbody = post_import(digest_payload, token, endpoint.replace("import-kb", "digest-email"), platform_token)
+            report["digest"] = {"status": dcode, "body": dbody}
+        except Exception as exc:
+            report["digest"] = {"status": "error", "reason": f"{type(exc).__name__}: {exc}"[:200]}
     save_state(state)
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0 if not report["failed"] or report["imported"] else 1
