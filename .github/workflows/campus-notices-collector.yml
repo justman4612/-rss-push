@@ -30,8 +30,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, verified tag
-        with:
-          persist-credentials: false
+        # 需要默认 GITHUB_TOKEN 推送状态文件（persist-credentials 默认 true，勿改）
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
