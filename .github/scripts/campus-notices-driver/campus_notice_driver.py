@@ -45,6 +45,9 @@ LIST_SOURCES = [
     # 因此正则直接捕获完整 href，交给 urljoin 解析。
     ("教务处", "https://jwch.xsyu.edu.cn/tzgg.htm", re.compile(r'href="([^"]*info/1048/\d+\.htm)"')),
     ("学校官网", "https://www.xsyu.edu.cn/xwzx/tzgg.htm", re.compile(r'href="([^"]*info/1072/\d+\.htm)"')),
+    # 2026-11-01 扩展栏目：学生相关度高的学院通知与图书馆通知（栏目号实测：1052 / 1038+1040）
+    ("计算机学院", "https://jsjxy.xsyu.edu.cn/tzgg.htm", re.compile(r'href="([^"]*info/1052/\d+\.htm)"')),
+    ("图书馆", "https://lib.xsyu.edu.cn/", re.compile(r'href="([^"]*info/10(?:38|40)/\d+\.htm)"')),
 ]
 
 META_LINE_RE = re.compile(r"发布时间[：:]\s*(\d{4}-\d{2}-\d{2}(?: \d{2}:\d{2}:\d{2})?)")
