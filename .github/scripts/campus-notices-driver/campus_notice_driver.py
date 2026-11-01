@@ -40,9 +40,11 @@ STATE_PATH = HERE / "known_notices.json"
 DEFAULT_IMPORT_ENDPOINT = "https://s5h8t653w3.coze.site/internal/notices/import-kb"
 
 LIST_SOURCES = [
-    # 教务处列表页用相对链接（info/1048/xxx.htm），官网用绝对路径（/info/1072/...），正则统一不带前导斜杠
-    ("教务处", "https://jwch.xsyu.edu.cn/tzgg.htm", re.compile(r"info/1048/\d+\.htm")),
-    ("学校官网", "https://www.xsyu.edu.cn/xwzx/tzgg.htm", re.compile(r"info/1072/\d+\.htm")),
+    # 2026-11-01 实测：官网列表页链接改为相对形式 "../info/1072/xxx.htm"，
+    # 只匹配路径片段再用 urljoin 会拼出 /xwzx/info/... 这种 404 地址，
+    # 因此正则直接捕获完整 href，交给 urljoin 解析。
+    ("教务处", "https://jwch.xsyu.edu.cn/tzgg.htm", re.compile(r'href="([^"]*info/1048/\d+\.htm)"')),
+    ("学校官网", "https://www.xsyu.edu.cn/xwzx/tzgg.htm", re.compile(r'href="([^"]*info/1072/\d+\.htm)"')),
 ]
 
 META_LINE_RE = re.compile(r"发布时间[：:]\s*(\d{4}-\d{2}-\d{2}(?: \d{2}:\d{2}:\d{2})?)")
@@ -92,7 +94,7 @@ def discover():
     for name, list_url, pattern in LIST_SOURCES:
         html = http_get(list_url).decode("utf-8", "replace")
         for match in pattern.finditer(html):
-            url = urljoin(list_url, match.group(0))
+            url = urljoin(list_url, match.group(1))
             if url not in seen:
                 seen.add(url)
                 found.append((url, name))
@@ -186,7 +188,12 @@ def main():
         if url in state["known"]:
             report["skipped_known"] += 1
         elif len(docs) < args.limit:
-            doc, err = build_document(url, source_name)
+            try:
+                doc, err = build_document(url, source_name)
+            except Exception as exc:  # 单条抓取失败（含 404/超时/解析异常）不中断整批
+                report["failed"].append({"url": url, "ok": False,
+                                         "reason": f"{type(exc).__name__}: {exc}"[:200]})
+                continue
             if doc:
                 docs.append(doc)
             else:
